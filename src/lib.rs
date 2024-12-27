@@ -33,7 +33,7 @@ where
     }
 
     #[cfg(feature = "embassy-time")]
-    pub fn new(spi: S, cs: C) -> Self {
+    pub fn new(spi: S) -> Self {
         Self {
             spi,
             read_buff: [0],
