@@ -15,18 +15,16 @@ pub trait MFRC522Debug {
     async fn debug_dump_card_details(&mut self, uid: &Uid) -> Result<(), PCDErrorCode>;
 }
 
-impl<S, C> MFRC522<S, C>
+impl<S> MFRC522<S>
 where
     S: embedded_hal_async::spi::SpiDevice,
-    C: OutputPin,
 {
     pub async fn test(&mut self) {}
 }
 
-impl<S, C> MFRC522Debug for MFRC522<S, C>
+impl<S> MFRC522Debug for MFRC522<S>
 where
     S: embedded_hal_async::spi::SpiDevice,
-    C: OutputPin,
 {
     async fn debug_dump_card(&mut self, uid: &Uid) -> Result<(), PCDErrorCode> {
         self.debug_dump_card_details(&uid).await?;
@@ -81,8 +79,8 @@ where
     }
 }
 
-async fn dump_mifare_classic<S: SpiDevice, C: OutputPin>(
-    mfrc522: &mut MFRC522<S, C>,
+async fn dump_mifare_classic<S: SpiDevice>(
+    mfrc522: &mut MFRC522<S>,
     uid: &Uid,
     key: &[u8],
     picc_type: PICCType,
@@ -107,8 +105,8 @@ async fn dump_mifare_classic<S: SpiDevice, C: OutputPin>(
     Ok(())
 }
 
-async fn dump_mifare_classic_sector<S: SpiDevice, C: OutputPin>(
-    mfrc522: &mut MFRC522<S, C>,
+async fn dump_mifare_classic_sector<S: SpiDevice>(
+    mfrc522: &mut MFRC522<S>,
     uid: &Uid,
     key: &[u8],
     sector: u8,
@@ -216,8 +214,8 @@ async fn dump_mifare_classic_sector<S: SpiDevice, C: OutputPin>(
     Ok(())
 }
 
-async fn dump_mifare_ultralight<S: SpiDevice, C: OutputPin>(
-    mfrc522: &mut MFRC522<S, C>,
+async fn dump_mifare_ultralight<S: SpiDevice>(
+    mfrc522: &mut MFRC522<S>,
 ) -> Result<(), PCDErrorCode> {
     let mut buff = [0; 18];
     let mut i;
