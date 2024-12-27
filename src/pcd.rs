@@ -16,7 +16,7 @@ macro_rules! assert_rb {
 
 impl<S, C> MFRC522<S, C>
 where
-    S: embedded_hal_async::spi::SpiBus,
+    S: embedded_hal_async::spi::SpiDevice,
     C: OutputPin,
 {
     pub async fn pcd_init(&mut self) -> Result<(), PCDErrorCode> {
@@ -56,7 +56,7 @@ where
     }
 
     pub async fn pcd_reset(&mut self) -> Result<(), PCDErrorCode> {
-        self.spi.flush().await.map_err(|_| PCDErrorCode::Unknown)?;
+        // self.spi.flush().await.map_err(|_| PCDErrorCode::Unknown)?;
         self.write_reg(PCDRegister::CommandReg, PCDCommand::SoftReset)
             .await?;
 

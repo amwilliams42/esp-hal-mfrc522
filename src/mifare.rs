@@ -7,7 +7,7 @@ use crate::{
 
 impl<S, C> MFRC522<S, C>
 where
-    S: embedded_hal_async::spi::SpiBus,
+    S: embedded_hal_async::spi::SpiDevice,
     C: OutputPin,
 {
     pub async fn mifare_read(

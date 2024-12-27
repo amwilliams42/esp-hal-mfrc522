@@ -11,7 +11,7 @@ pub mod picc;
 
 pub struct MFRC522<S, C>
 where
-    S: embedded_hal_async::spi::SpiBus,
+    S: embedded_hal_async::spi::SpiDevice,
     C: OutputPin,
 {
     spi: S,
@@ -23,7 +23,7 @@ where
 
 impl<S, C> MFRC522<S, C>
 where
-    S: embedded_hal_async::spi::SpiBus,
+    S: embedded_hal_async::spi::SpiDevice,
     C: OutputPin,
 {
     #[cfg(not(feature = "embassy-time"))]
