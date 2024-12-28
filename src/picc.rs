@@ -4,9 +4,10 @@ use crate::{
 };
 use embedded_hal::digital::OutputPin;
 
-impl<S> MFRC522<S>
+impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
+    C: OutputPin,
 {
     pub async fn picc_is_new_card_present(&mut self) -> Result<(), PCDErrorCode> {
         let mut buffer_atqa = [0; 2];

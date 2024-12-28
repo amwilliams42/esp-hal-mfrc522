@@ -5,9 +5,10 @@ use crate::{
     MFRC522,
 };
 
-impl<S> MFRC522<S>
+impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
+    C: OutputPin,
 {
     pub async fn mifare_read(
         &mut self,

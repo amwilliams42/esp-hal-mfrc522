@@ -14,9 +14,10 @@ macro_rules! assert_rb {
     };
 }
 
-impl<S> MFRC522<S>
+impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
+    C: OutputPin,
 {
     pub async fn pcd_init(&mut self) -> Result<(), PCDErrorCode> {
         self.pcd_reset().await?;

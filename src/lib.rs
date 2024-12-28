@@ -1,9 +1,7 @@
 #![no_std]
 
 use consts::{PCDErrorCode, Uid, UidSize};
-use embedded_hal::{digital::OutputPin, spi::SpiBus};
-use embedded_hal_bus::spi::RefCellDevice;
-use embedded_hal::spi::SpiDevice;
+use embedded_hal::digital::OutputPin;
 
 pub mod consts;
 pub mod debug;
@@ -11,33 +9,38 @@ pub mod mifare;
 pub mod pcd;
 pub mod picc;
 
-pub struct MFRC522<S>
+pub struct MFRC522<S, C>
 where
-    S: SpiDevice,
+    S: embedded_hal::spi::SpiDevice,
+    C: OutputPin,
 {
     spi: S,
+    cs: C,
     read_buff: [u8; 1],
 
     get_current_time: fn() -> u64,
 }
 
-impl<S> MFRC522<S>
+impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
+    C: OutputPin,
 {
     #[cfg(not(feature = "embassy-time"))]
-    pub fn new(spi: S, get_current_time: fn() -> u64) -> Self {
+    pub fn new(spi: S, cs: C, get_current_time: fn() -> u64) -> Self {
         Self {
             spi,
+            cs,
             read_buff: [0],
             get_current_time,
         }
     }
 
     #[cfg(feature = "embassy-time")]
-    pub fn new(spi: S) -> Self {
+    pub fn new(spi: S, cs: C) -> Self {
         Self {
             spi,
+            cs,
             read_buff: [0],
 
             get_current_time: || embassy_time::Instant::now().as_micros(),
@@ -67,8 +70,10 @@ where
     }
 
     pub async fn write_reg(&mut self, reg: u8, val: u8) -> Result<(), PCDErrorCode> {
+        self.cs.set_low().map_err(|_| PCDErrorCode::Unknown)?;
         self.spi_transfer(&[reg << 1]).await?;
         self.spi_transfer(&[val]).await?;
+        self.cs.set_high().map_err(|_| PCDErrorCode::Unknown)?;
 
         Ok(())
     }
@@ -79,19 +84,24 @@ where
         count: usize,
         values: &[u8],
     ) -> Result<(), PCDErrorCode> {
+        self.cs.set_low().map_err(|_| PCDErrorCode::Unknown)?;
         self.spi_transfer(&[reg << 1]).await?;
 
         for i in 0..count {
             self.spi_transfer(&[values[i]]).await?;
         }
+
+        self.cs.set_high().map_err(|_| PCDErrorCode::Unknown)?;
         Ok(())
     }
 
     pub async fn read_reg(&mut self, reg: u8) -> Result<u8, PCDErrorCode> {
         let zero_buf = [0];
 
+        self.cs.set_low().map_err(|_| PCDErrorCode::Unknown)?;
         self.spi_transfer(&[(reg << 1) | 0x80]).await?;
         self.spi_transfer(&zero_buf).await?;
+        self.cs.set_high().map_err(|_| PCDErrorCode::Unknown)?;
 
         Ok(self.read_buff[0])
     }
@@ -110,6 +120,7 @@ where
         let addr = 0x80 | (reg << 1);
         let mut index = 0;
 
+        self.cs.set_low().map_err(|_| PCDErrorCode::Unknown)?;
         self.spi_transfer(&[addr]).await?;
 
         if rx_align > 0 {
@@ -129,6 +140,8 @@ where
         let zero_buf = [0];
         self.spi_transfer(&zero_buf).await?;
         output_buff[index] = self.read_buff[0];
+
+        self.cs.set_high().map_err(|_| PCDErrorCode::Unknown)?;
         Ok(())
     }
 
