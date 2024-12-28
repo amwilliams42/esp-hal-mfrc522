@@ -13,7 +13,7 @@ pub mod picc;
 pub struct MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
-    C: Flex,
+    C: OutputPin,
 {
     spi: S,
     cs: C,
@@ -25,10 +25,10 @@ where
 impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
-    C: Flex,
+    C: OutputPin,
 {
     #[cfg(not(feature = "embassy-time"))]
-    pub fn new(spi: S, cs: C, get_current_time: fn() -> u64) -> Self {
+    pub fn new(spi: S, cs: Flex, get_current_time: fn() -> u64) -> Self {
         Self {
             spi,
             cs,
@@ -38,7 +38,7 @@ where
     }
 
     #[cfg(feature = "embassy-time")]
-    pub fn new(spi: S, cs: C) -> Self {
+    pub fn new(spi: S, cs: Flex) -> Self {
         Self {
             spi,
             cs,
