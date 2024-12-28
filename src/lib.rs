@@ -1,7 +1,9 @@
 #![no_std]
 
 use consts::{PCDErrorCode, Uid, UidSize};
-use embedded_hal::digital::OutputPin;
+use embedded_hal::{digital::OutputPin, spi::SpiBus};
+use embedded_hal_bus::spi::RefCellDevice;
+use embedded_hal::spi::SpiDevice;
 
 pub mod consts;
 pub mod debug;
@@ -11,7 +13,7 @@ pub mod picc;
 
 pub struct MFRC522<S>
 where
-    S: embedded_hal_async::spi::SpiDevice,
+    S: SpiDevice,
 {
     spi: S,
     read_buff: [u8; 1],
@@ -21,7 +23,7 @@ where
 
 impl<S> MFRC522<S>
 where
-    S: embedded_hal_async::spi::SpiDevice,
+    S: embedded_hal::spi::SpiDevice,
 {
     #[cfg(not(feature = "embassy-time"))]
     pub fn new(spi: S, get_current_time: fn() -> u64) -> Self {
@@ -133,7 +135,6 @@ where
     async fn spi_transfer(&mut self, data: &[u8]) -> Result<(), PCDErrorCode> {
         self.spi
             .transfer(&mut self.read_buff, data)
-            .await
             .map_err(|_| PCDErrorCode::Unknown)?;
 
         Ok(())

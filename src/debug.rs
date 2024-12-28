@@ -5,7 +5,7 @@ use crate::{
     MFRC522,
 };
 use embedded_hal::digital::OutputPin;
-use embedded_hal_async::spi::{SpiBus, SpiDevice};
+use embedded_hal::spi::{SpiBus, SpiDevice};
 use heapless::String;
 
 #[allow(async_fn_in_trait)]
@@ -17,14 +17,14 @@ pub trait MFRC522Debug {
 
 impl<S> MFRC522<S>
 where
-    S: embedded_hal_async::spi::SpiDevice,
+    S: embedded_hal::spi::SpiDevice,
 {
     pub async fn test(&mut self) {}
 }
 
 impl<S> MFRC522Debug for MFRC522<S>
 where
-    S: embedded_hal_async::spi::SpiDevice,
+    S: embedded_hal::spi::SpiDevice,
 {
     async fn debug_dump_card(&mut self, uid: &Uid) -> Result<(), PCDErrorCode> {
         self.debug_dump_card_details(&uid).await?;

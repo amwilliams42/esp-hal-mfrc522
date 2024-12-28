@@ -6,7 +6,7 @@ use embedded_hal::digital::OutputPin;
 
 impl<S> MFRC522<S>
 where
-    S: embedded_hal_async::spi::SpiDevice,
+    S: embedded_hal::spi::SpiDevice,
 {
     pub async fn picc_is_new_card_present(&mut self) -> Result<(), PCDErrorCode> {
         let mut buffer_atqa = [0; 2];
