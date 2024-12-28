@@ -16,7 +16,7 @@ where
     C: OutputPin,
 {
     spi: S,
-    cs: Flex,
+    cs: C,
     read_buff: [u8; 1],
 
     get_current_time: fn() -> u64,
@@ -28,7 +28,7 @@ where
     C: OutputPin,
 {
     #[cfg(not(feature = "embassy-time"))]
-    pub fn new(spi: S, cs: Flex, get_current_time: fn() -> u64) -> Self {
+    pub fn new(spi: S, cs: C, get_current_time: fn() -> u64) -> Self {
         Self {
             spi,
             cs,
@@ -38,7 +38,7 @@ where
     }
 
     #[cfg(feature = "embassy-time")]
-    pub fn new(spi: S, cs: Flex) -> Self {
+    pub fn new(spi: S, cs: C) -> Self {
         Self {
             spi,
             cs,
