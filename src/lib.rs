@@ -2,6 +2,7 @@
 
 use consts::{PCDErrorCode, Uid, UidSize};
 use embedded_hal::digital::OutputPin;
+use esp_hal::gpio::Flex;
 
 pub mod consts;
 pub mod debug;
@@ -12,7 +13,7 @@ pub mod picc;
 pub struct MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
-    C: OutputPin,
+    C: Flex,
 {
     spi: S,
     cs: C,
@@ -24,7 +25,7 @@ where
 impl<S, C> MFRC522<S, C>
 where
     S: embedded_hal::spi::SpiDevice,
-    C: OutputPin,
+    C: Flex,
 {
     #[cfg(not(feature = "embassy-time"))]
     pub fn new(spi: S, cs: C, get_current_time: fn() -> u64) -> Self {
