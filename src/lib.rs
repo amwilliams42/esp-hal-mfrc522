@@ -16,7 +16,7 @@ where
     C: OutputPin,
 {
     spi: S,
-    cs: C,
+    cs: Flex,
     read_buff: [u8; 1],
 
     get_current_time: fn() -> u64,
